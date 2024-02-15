@@ -46,25 +46,17 @@ function App() {
       console.error('Error fetching questions:', error);
     }
   };
-
   const handleNextQuestion = () => {
-    const currentQuestion = questions[currentQuestionIndex];
-    const selectedAnswer = formik.values.answers[currentQuestion.id];
-    const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
-  
-    // Update the score based on correctness
-    setScore((prevScore) => (isCorrect ? prevScore + 1 : prevScore));
-  
     setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
   };
   
   const handleAnswerSelected = (choice) => {
     const currentQuestion = questions[currentQuestionIndex];
     const isCorrect = choice === currentQuestion.correctAnswer;
-  
-    // Update the score based on correctness
+
+    // Update the score based on correctness (2 points for each correct answer)
     setScore((prevScore) => (isCorrect ? prevScore + 1 : prevScore));
-  
+
     formik.handleChange({
       target: {
         name: `answers.${currentQuestion.id}`,
@@ -72,7 +64,6 @@ function App() {
       },
     });
   };
-  
 
   const handlePrevQuestion = () => {
     setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
@@ -92,26 +83,28 @@ function App() {
       <div>
         <Navbar />
         <Routes>
+        <Route path="/about" element={<About />} />
         <Route
-          path="/questions"
-          element={
-            questions?.length > 0 ? (
-              <Question
-                questions={questions}
-                formik={formik}
-                currentQuestionIndex={currentQuestionIndex}
-                onNext={handleNextQuestion}
-                onPrev={handlePrevQuestion}
-                onAnswerSelected={handleAnswerSelected} 
-              />
-            ) : <p>No questions available.</p>
-          }
-        />
+        path="/questions"
+        element={
+        questions?.length > 0 ? (
+        <Question
+        questions={questions}
+        setQuestions={setQuestions}
+        formik={formik}
+        currentQuestionIndex={currentQuestionIndex}
+        onNext={handleNextQuestion}
+        onPrev={handlePrevQuestion}
+        onAnswerSelected={handleAnswerSelected}
+      />
+    ) : (
+      <p>No questions available.</p>
+    )
+  }
+/>
 
-          <Route path="/score" element={<Score score={score} />} />
+          <Route path="/score" element={<Score score={score} questions={questions} />} />
           <Route path="/feedback" element={<Feedback />} />
-          <Route path="/about" element={<About />} />
-          {/* Add a route for the root path if needed */}
           <Route path="/" element={<p>Welcome to the Quiz App!</p>} />
         </Routes>
       </div>
