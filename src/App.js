@@ -6,6 +6,22 @@ import Score from './components/Score';
 import Feedback from './components/Feedback';
 import About from './components/About';
 import { useFormik } from 'formik';
+import Footer from './components/Footer';
+import './App.css';
+
+const shuffleArray = (array) => {
+  const shuffledArray = [...array];
+  for (let i = shuffledArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+  }
+  return shuffledArray;
+};
+
+const sampleQuestions = (questions, count) => {
+  const shuffledQuestions = shuffleArray(questions);
+  return shuffledQuestions.slice(0, count);
+};
 
 function App() {
   const [questions, setQuestions] = useState([]);
@@ -17,96 +33,71 @@ function App() {
       answers: {},
     },
     onSubmit: () => {
-      // Calculate the score based on selected answers
       const newScore = Object.values(formik.values.answers).reduce(
         (acc, answer) => (answer ? acc + 1 : acc),
         0
       );
       setScore(newScore);
+
+      setCurrentQuestionIndex(0);
+      formik.resetForm();
     },
   });
 
-  const fetchQuestions = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/questions/');
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('Fetched data:', data);
-
-      // Check if the fetched data is an array
-      if (Array.isArray(data)) {
-        setQuestions(data);
-      } else {
-        console.error('Invalid data format. Expected an array.');
-      }
-    } catch (error) {
-      console.error('Error fetching questions:', error);
-    }
-  };
-  const handleNextQuestion = () => {
-    setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-  };
-  
-  const handleAnswerSelected = (choice) => {
-    const currentQuestion = questions[currentQuestionIndex];
-    const isCorrect = choice === currentQuestion.correctAnswer;
-
-    // Update the score based on correctness (2 points for each correct answer)
-    setScore((prevScore) => (isCorrect ? prevScore + 1 : prevScore));
-
-    formik.handleChange({
-      target: {
-        name: `answers.${currentQuestion.id}`,
-        value: choice,
-      },
-    });
-  };
-
-  const handlePrevQuestion = () => {
-    setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
-  };
-
   useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const response = await fetch('http://localhost:4000/questions/');
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Fetched data:', data);
+
+        if (Array.isArray(data)) {
+          const shuffledQuestions = shuffleArray(data);
+          const selectedQuestions = sampleQuestions(shuffledQuestions, 5);
+          setQuestions(selectedQuestions);
+        } else {
+          console.error('Invalid data format. Expected an array.');
+        }
+      } catch (error) {
+        console.error('Error fetching questions:', error);
+      }
+    };
+
     fetchQuestions();
   }, []);
-
-  useEffect(() => {
-    console.log('Updated Questions:', questions);
-    console.log('Updated Formik Values:', formik.values);
-  }, [questions, formik.values]);
 
   return (
     <Router>
       <div>
         <Navbar />
         <Routes>
-        <Route path="/about" element={<About />} />
-        <Route
-        path="/questions"
-        element={
-        questions?.length > 0 ? (
-        <Question
-        questions={questions}
-        setQuestions={setQuestions}
-        formik={formik}
-        currentQuestionIndex={currentQuestionIndex}
-        onNext={handleNextQuestion}
-        onPrev={handlePrevQuestion}
-        onAnswerSelected={handleAnswerSelected}
-      />
-    ) : (
-      <p>No questions available.</p>
-    )
-  }
-/>
-
+          <Route path="/about" element={<About />}  />
+          <Route
+            path="/questions"
+            element={
+              questions?.length > 0 ? (
+                <Question
+                  questions={questions}
+                  formik={formik}
+                  currentQuestionIndex={currentQuestionIndex}
+                  setCurrentQuestionIndex={setCurrentQuestionIndex} 
+                  score={score}
+                  setScore={setScore}
+                />
+              ) : (
+                <p>No questions available.</p>
+              )
+            }
+          />
           <Route path="/score" element={<Score score={score} questions={questions} />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/" element={<p>Welcome to the Quiz App!</p>} />
         </Routes>
+        <Footer />
       </div>
     </Router>
   );
