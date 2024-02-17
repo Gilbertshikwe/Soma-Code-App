@@ -21,7 +21,7 @@ function Feedback() {
 
         if (response.ok) {
           setSubmissionStatus('success');
-          resetForm();
+          resetForm(); // Reset the form after successful submission
         } else {
           setSubmissionStatus('error');
         }
@@ -88,9 +88,9 @@ function Feedback() {
           </ul>
         </div>
       )}
-
     </div>
   );
 }
 
 export default Feedback;
+
