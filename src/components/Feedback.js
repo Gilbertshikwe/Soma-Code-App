@@ -11,7 +11,7 @@ function Feedback() {
     },
     onSubmit: async (values, { resetForm }) => {
       try {
-        const response = await fetch('https://json-server-vercel-vnha.vercel.app/feedback', {
+        const response = await fetch('http://localhost:4000/feedback', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -21,7 +21,7 @@ function Feedback() {
 
         if (response.ok) {
           setSubmissionStatus('success');
-          resetForm(); // Reset the form after successful submission
+          resetForm();
         } else {
           setSubmissionStatus('error');
         }
@@ -42,7 +42,7 @@ function Feedback() {
   useEffect(() => {
     const fetchAllFeedback = async () => {
       try {
-        const response = await fetch('https://json-server-vercel-vnha.vercel.app/feedback');
+        const response = await fetch('http://localhost:4000/feedback');
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -88,9 +88,9 @@ function Feedback() {
           </ul>
         </div>
       )}
+
     </div>
   );
 }
 
 export default Feedback;
-
