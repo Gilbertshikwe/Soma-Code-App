@@ -47,7 +47,7 @@ function App() {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch('http://localhost:4000/questions/');
+        const response = await fetch('https://json-server-vercel-es2r.vercel.app/questions');
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
