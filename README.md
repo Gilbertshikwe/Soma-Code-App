@@ -51,13 +51,13 @@ As a user, I can:
 
 5. Start the JSON server:
 
-`json-server db.json --port 4000`
+`json-server db.json --port 3000`
 
 6. Two links for the resources will be provided to you upon execution of the command:
 
-`http://localhost:4000/questions`
+`http://localhost:3000/questions`
 
-`http://localhost:4000/feedback`
+`http://localhost:3000/feedback`
 
 ### Explore the Features
 1. Browse available quizzes and select one to attempt.
@@ -65,3 +65,5 @@ As a user, I can:
 3. Receive immediate feedback on correct and incorrect answers.
 4. View overall score and performance summary after completing the quiz.
 5. Provide your own feedback in the feedback section
+### Direct Link To The App
+ `https://soma-code-app.vercel.app/`
